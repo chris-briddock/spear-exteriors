@@ -1,0 +1,73 @@
+<header class="bg-white flex items-center justify-between px-2 py-1 pb-1 pt-1 shadow-lg">
+  <div class="container mx-auto flex items-center justify-between">
+    <div class="flex items-center">
+      <app-branding />
+    </div>
+    <button class="flex items-center focus:outline-none animated-button z-10" (click)="toggleNav()"
+      [ngClass]="{'open': isNavOpen}">
+      <div class="relative flex-shrink-0">
+        <span class="block h-1 w-8 bg-custom-primary mb-1.5 "></span>
+        <span class="block h-1 w-6 bg-custom-primary mt-1 mb-1.5"></span>
+        <span class="block h-1 w-2 bg-custom-primary mt-1 mb-1.5"></span>
+      </div>
+    </button>
+  </div>
+</header>
+<nav class="bg-custom-primary min-h-screen fixed top-0 left-0 w-1/2 pb-4 flex justify-center animate__animated z-30" 
+  [ngClass]="{
+    'hidden': navState === 'hidden',
+    'animate__fadeOutLeft': navState === 'closing',
+    'animate__fadeInLeft': navState === 'visible'
+  }">
+  <div class="w-3/4 md:w-1/2">
+    <div class="w-3/4 mx-auto">
+        <button id="Home" type="button"
+          class="flex justify-between items-center text-white w-full text-center font-semibold py-2 mt-6">
+          <a [routerLink]="['/']" class="text-lg md:text-xl pl-7 mx-auto font-white animate__animated"
+            [ngClass]="{'animate__fadeInLeft animate__delay-1s': isNavOpen}">
+            Home
+          </a>
+        </button>
+      <div *ngFor="let item of navigationItems; let i = index">
+        <button id={{item.title}} type="button"
+          class="flex justify-between items-center text-white w-full text-center font-semibold py-2"
+          (click)="toggleAccordionItem(item)" [attr.aria-expanded]="item.expanded"
+          [attr.aria-controls]="'item.text-' + item.id">
+          <h1 class="text-lg md:text-xl pl-12 mx-auto font-white animate__animated"
+            [ngClass]="{'animate__fadeInLeft animate__delay-1s ': isNavOpen}">
+            {{ item.title }}
+          </h1>
+          <svg
+            class="fill-white shrink-0 ml-4 transform origin-center transition duration-200 ease-out z-10 animate__animated"
+            [ngClass]="{'rotate-180': item.expanded, 'animate__fadeInLeft animate__delay-1s': isNavOpen }"
+            xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="16" height="16"
+            shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality"
+            fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 298.04">
+            <path fill-rule="nonzero"
+              d="M12.08 70.78c-16.17-16.24-16.09-42.54.15-58.7 16.25-16.17 42.54-16.09 58.71.15L256 197.76 441.06 12.23c16.17-16.24 42.46-16.32 58.71-.15 16.24 16.16 16.32 42.46.15 58.7L285.27 285.96c-16.24 16.17-42.54 16.09-58.7-.15L12.08 70.78z" />
+          </svg>
+        </button>
+        <div [id]="'item.text-' + item.id" role="region" [attr.aria-labelledby]="'item.title-' + item.id"
+          class="grid text-sm overflow-hidden transition-all duration-300 ease-in-out text-white"
+          [class.grid-rows-[1fr]]="item.expanded" [class.opacity-100]="item.expanded"
+          [class.grid-rows-[0fr]]="!item.expanded" [class.opacity-0]="!item.expanded">
+          <div class="overflow-hidden">
+            <ul class="pb-3 text-center list-none">
+              <li *ngFor="let contentItem of item.content; let i = index" class="py-2 pl-2">
+                {{ contentItem }}
+                <!-- <a [routerLink]="i < item.content.length - 2 ? 'services/' + item.link[i] : item.link[i]"></a> -->
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+        <button id="Home" type="button"
+          class="flex justify-between items-center text-white w-full text-center font-semibold mt-2">
+          <a [routerLink]="['/']" class="text-lg md:text-xl pl-6 mx-auto font-white animate__animated"
+            [ngClass]="{'animate__fadeInLeft animate__delay-1s': isNavOpen}">
+            About Us
+          </a>
+        </button>
+    </div>
+  </div>
+</nav>
