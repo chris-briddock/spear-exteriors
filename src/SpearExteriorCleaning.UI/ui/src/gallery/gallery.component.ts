@@ -10,20 +10,20 @@ import { NgOptimizedImage } from '@angular/common';
 })
 
 export class GalleryComponent implements OnInit {
-  // videos = [
-  //   "assets/CommercialWindowCleaning/CommerciaCleaning1.mp4", 
-  //   "assets/CommercialWindowCleaning/CommerciaCleaning3.mp4", 
-  //   "assets/CommercialWindowCleaning/CommerciaCleaning.mp4", 
-  //   "assets/CommercialWindowCleaning/CommercialCleaning1.mp4", 
-  //   "assets/CommercialWindowCleaning/CommercialCleaning3.mp4", 
-  //   "assets/PressureWashing/PressureWashing2.mp4", 
-  //   "assets/PressureWashing/PressureWashing3.mp4", 
-  //   "assets/PressureWashing/PresurreWashing1.mp4", 
-  //   "assets/RoofCleaning/RoofCleaning1.mp4", 
-  //   "assets/WindowCleaning/WindowCleaning1.mp4", 
-  //   "assets/WindowCleaning/WindowCleaning2.mp4", 
-  //   "assets/WindowCleaning/WindowCleaning2.mp4"
-  // ];
+  videos = [
+    "assets/CommercialWindowCleaning/CommerciaCleaning1.mp4", 
+    "assets/CommercialWindowCleaning/CommerciaCleaning3.mp4", 
+    "assets/CommercialWindowCleaning/CommerciaCleaning.mp4", 
+    "assets/CommercialWindowCleaning/CommercialCleaning1.mp4", 
+    "assets/CommercialWindowCleaning/CommercialCleaning3.mp4", 
+    "assets/PressureWashing/PressureWashing2.mp4", 
+    "assets/PressureWashing/PressureWashing3.mp4", 
+    "assets/PressureWashing/PresurreWashing1.mp4", 
+    "assets/RoofCleaning/RoofCleaning1.mp4", 
+    "assets/WindowCleaning/WindowCleaning1.mp4", 
+    "assets/WindowCleaning/WindowCleaning2.mp4", 
+    "assets/WindowCleaning/WindowCleaning2.mp4"
+  ];
 
   images = [
     "assets/ConservatoryCleaning/Conservatory1.png", 
