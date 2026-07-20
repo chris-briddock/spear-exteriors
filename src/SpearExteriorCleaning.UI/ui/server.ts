@@ -1,57 +1,82 @@
-import { APP_BASE_HREF } from '@angular/common';
-import { CommonEngine } from '@angular/ssr';
-import express from 'express';
+import {
+  AngularNodeAppEngine,
+  createNodeRequestHandler,
+  isMainModule,
+  writeResponseToNodeResponse,
+} from '@angular/ssr/node';
+import express, { type Request } from 'express';
 import { fileURLToPath } from 'node:url';
-import { dirname, join, resolve } from 'node:path';
-import bootstrap from './src/main.server';
+import { dirname, resolve } from 'node:path';
+import { createGoCardlessRouter } from './server/gocardless-router';
 
-// The Express app is exported so that it can be used by serverless Functions.
-export function app(): express.Express {
-  const server = express();
-  const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-  const browserDistFolder = resolve(serverDistFolder, '../browser');
-  const indexHtml = join(serverDistFolder, 'index.server.html');
-
-  const commonEngine = new CommonEngine();
-
-  server.set('view engine', 'html');
-  server.set('views', browserDistFolder);
-
-  // Example Express Rest API endpoints
-  // server.get('/api/**', (req, res) => { });
-  // Serve static files from /browser
-  server.get('**', express.static(browserDistFolder, {
-    maxAge: '1y',
-    index: 'index.html',
-  }));
-
-  // All regular routes use the Angular engine
-  server.get('**', (req, res, next) => {
-    const { protocol, originalUrl, baseUrl, headers } = req;
-
-    commonEngine
-      .render({
-        bootstrap,
-        documentFilePath: indexHtml,
-        url: `${protocol}://${headers.host}${originalUrl}`,
-        publicPath: browserDistFolder,
-        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
-      })
-      .then((html) => res.send(html))
-      .catch((err) => next(err));
-  });
-
-  return server;
+function getAllowedHosts(): string[] {
+  const hosts = new Set<string>(['localhost', '127.0.0.1']);
+  const siteUrl = process.env['SITE_URL'];
+  if (siteUrl) {
+    try {
+      hosts.add(new URL(siteUrl).hostname);
+    } catch {
+      console.warn(`SITE_URL "${siteUrl}" is not a valid URL, ignoring it for allowedHosts.`);
+    }
+  }
+  const extraHosts = process.env['ALLOWED_HOSTS'];
+  if (extraHosts) {
+    for (const host of extraHosts.split(',')) {
+      const trimmed = host.trim();
+      if (trimmed) {
+        hosts.add(trimmed);
+      }
+    }
+  }
+  return [...hosts];
 }
 
-function run(): void {
-  const port = process.env['PORT'] || 4000;
+const serverDistFolder = dirname(fileURLToPath(import.meta.url));
+const browserDistFolder = resolve(serverDistFolder, '../browser');
 
-  // Start up the Node server
-  const server = app();
-  server.listen(port, () => {
+const app = express();
+const angularApp = new AngularNodeAppEngine({ allowedHosts: getAllowedHosts() });
+
+// Required for req.secure / req.protocol to reflect the original client
+// scheme when running behind a reverse proxy (e.g. Azure).
+app.set('trust proxy', 1);
+
+app.use(
+  express.json({
+    verify: (req, _res, buf) => {
+      (req as Request & { rawBody?: Buffer }).rawBody = buf;
+    },
+  }),
+);
+app.use('/api/gocardless', createGoCardlessRouter());
+
+// Serve static files from /browser
+app.use(
+  express.static(browserDistFolder, {
+    maxAge: '1y',
+    index: false,
+    redirect: false,
+  }),
+);
+
+// All regular routes use the Angular engine
+app.use('**', (req, res, next) => {
+  angularApp
+    .handle(req)
+    .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
+    .catch(next);
+});
+
+/**
+ * Start the server if this module is the main entry point.
+ * The server can also be run from a serverless function by importing `reqHandler`.
+ */
+if (isMainModule(import.meta.url)) {
+  const port = process.env['PORT'] || 4000;
+  app.listen(port, () => {
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }
 
-run();
+// Request handler used by the Angular CLI (for dev-server and during build) or Node Express server
+export const reqHandler = createNodeRequestHandler(app);

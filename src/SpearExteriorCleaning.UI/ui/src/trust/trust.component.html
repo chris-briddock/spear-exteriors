@@ -1,0 +1,43 @@
+<section id="about" class="bg-custom-cream py-20 md:py-28">
+  <div class="container mx-auto px-4">
+    <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <div class="relative order-2 lg:order-1">
+        <div class="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/5] max-w-md mx-auto">
+          <img ngSrc="assets/WindowCleaning/WindowCleaning3.png" fill priority
+            class="object-cover" alt="Water fed pole window cleaning in progress" />
+        </div>
+        <div class="hidden md:flex absolute -bottom-6 -right-4 lg:-right-8 bg-custom-navy text-white rounded-2xl shadow-xl px-6 py-5 flex-col items-start max-w-[13rem]">
+          <span class="font-heading font-extrabold text-2xl text-custom-light-blue">100%</span>
+          <span class="text-sm text-white/80">Pure water &middot; no residue, no streaks</span>
+        </div>
+      </div>
+
+      <div class="order-1 lg:order-2">
+        <span class="text-custom-primary font-heading font-semibold uppercase tracking-widest text-sm">Welcome to Spear</span>
+        <h2 class="font-heading text-3xl md:text-5xl font-extrabold text-custom-navy mt-3 mb-5">
+          Why homeowners choose us
+        </h2>
+        <p class="text-custom-dark-grey text-lg mb-8">
+          We offer a range of professional exterior cleaning services to keep your property looking its best &mdash;
+          reliable, thorough, and always with the details taken care of.
+        </p>
+
+        <div class="grid sm:grid-cols-2 gap-6">
+          @for (point of points; track point.title) {
+            <div class="flex gap-3">
+              <span class="shrink-0 w-10 h-10 rounded-full bg-custom-primary/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-custom-primary" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+              </span>
+              <div>
+                <h3 class="font-heading font-bold text-custom-navy mb-1">{{ point.title }}</h3>
+                <p class="text-sm text-custom-dark-grey leading-relaxed">{{ point.description }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

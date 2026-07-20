@@ -1,26 +1,56 @@
-<div class="relative h-screen overflow-hidden">
-    <div class="absolute inset-0 bg-transparent flex flex-col justify-center items-center z-10">
-      <h1 class="text-white text-4xl md:text-6xl font-bold mb-4">
-        Enhance Your Home’s Beauty
+<div id="home" class="relative min-h-[90vh] md:min-h-screen overflow-hidden flex items-center">
+  <video #heroVideo class="absolute inset-0 w-full h-full object-cover z-0" autoplay muted loop playsinline [muted]="true" [loop]="true" aria-hidden="true" poster="assets/WindowCleaning/WindowCleaning1.png">
+    <source src="assets/CommercialWindowCleaning/CommerciaCleaning2.mp4" type="video/mp4">
+  </video>
+  <div class="absolute inset-0 bg-gradient-to-b from-custom-navy/80 via-custom-navy/65 to-custom-navy/80 z-10"></div>
+
+  <div class="relative z-20 w-full">
+    <div class="container mx-auto px-4 flex flex-col items-center text-center py-24 md:py-0">
+      <span class="animate__animated animate__fadeInDown inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-xs md:text-sm font-semibold tracking-wide uppercase py-2 px-4 rounded-full mb-6">
+        Pure Water Technology &middot; Milton Keynes, Beds, Bucks &amp; Herts
+      </span>
+
+      <h1 class="animate__animated animate__fadeInUp font-heading text-white text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-5 max-w-4xl text-balance [text-shadow:0_2px_16px_rgba(11,37,69,0.65)]">
+        Enhance Your Home&rsquo;s Beauty
       </h1>
-      <p class="text-white text-lg md:text-2xl mb-8">
-        Top Quality Exterior Cleaning for Lasting Impressions
+      <p class="animate__animated animate__fadeInUp animate__delay-1s text-white text-lg md:text-2xl mb-10 max-w-2xl [text-shadow:0_1px_10px_rgba(11,37,69,0.6)]">
+        Top-quality window, gutter &amp; exterior cleaning for lasting impressions &mdash; streak-free, every time.
       </p>
-      <div class="flex space-x-4">
-        <a href="tel:+447498070462">
-          <button class="bg-custom-primary hover:bg-custom-light-blue transition-all text-white font-bold py-2 px-2 md:px-4 rounded">
-            Schedule a telephone consultation
-          </button>
+
+      <div class="animate__animated animate__fadeInUp animate__delay-1s flex flex-col sm:flex-row gap-4">
+        <a href="tel:+447498070462"
+          class="flex items-center justify-center gap-2 bg-custom-accent hover:bg-custom-accent-dark transition-all text-white font-heading font-semibold py-3.5 px-7 rounded-full shadow-lg shadow-black/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h1.5a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106a1.125 1.125 0 0 0-1.173.417l-.97 1.293a1.125 1.125 0 0 1-1.417.328 11.29 11.29 0 0 1-5.219-5.22 1.125 1.125 0 0 1 .329-1.416l1.292-.97a1.125 1.125 0 0 0 .418-1.173L8.963 3.102a1.125 1.125 0 0 0-1.091-.852H6.5A2.25 2.25 0 0 0 4.25 4.5v.75Z" />
+          </svg>
+          Call 07498 070462
         </a>
-        <a href="mailto:info@spearexteriors.co.uk">
-          <button class="bg-custom-primary hover:bg-custom-light-blue transition-all text-white font-bold py-2 px-2 md:px-4 rounded">
-            Enquire via email
-          </button>
+        <a href="#contact"
+          class="flex items-center justify-center gap-2 bg-white/95 hover:bg-white transition-all text-custom-navy font-heading font-semibold py-3.5 px-7 rounded-full shadow-lg shadow-black/10">
+          Get a Free Quote
         </a>
       </div>
     </div>
-    <video class="w-full h-full object-cover z-0" autoplay muted loop>
-        <source src="/assets/CommercialWindowCleaning/CommerciaCleaning2.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
   </div>
+
+  <a href="#services" aria-label="Scroll to services"
+    class="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex-col items-center gap-1 text-white/80 hover:text-white transition-colors animate-bounce">
+    <span class="text-xs uppercase tracking-widest">Explore</span>
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25 12 15.75 4.5 8.25" />
+    </svg>
+  </a>
+
+  <button type="button" (click)="toggleVideo()" [attr.aria-label]="isPlaying ? 'Pause background video' : 'Play background video'"
+    class="absolute bottom-5 right-5 z-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white flex items-center justify-center transition-colors">
+    @if (isPlaying) {
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+      </svg>
+    } @else {
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 5v14l11-7z" />
+      </svg>
+    }
+  </button>
+</div>

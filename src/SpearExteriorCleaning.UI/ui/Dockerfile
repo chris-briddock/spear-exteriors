@@ -1,55 +1,43 @@
-FROM alpine:latest as Base
+# syntax=docker/dockerfile:1
 
-# Install necessary packages
-RUN apk add --no-cache nodejs npm nginx
+ARG NODE_VERSION=24-alpine
 
-# Create a user and group for running the application
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
-# Create necessary directories and adjust permissions
-RUN mkdir -p /app /var/log/nginx /var/lib/nginx /run/nginx && \
-    chown -R appuser:appgroup /app /var/log/nginx /var/lib/nginx /run/nginx
-
-# Stage 2: Build Angular application
-FROM base as build-stage
-
-# Set the working directory
+# ---- Build the application ----
+FROM node:${NODE_VERSION} AS build
 WORKDIR /app
 
-# Copy the Angular application code
-COPY --chown=appuser:appgroup ./my-angular-app /app
-
+COPY package.json package-lock.json ./
 RUN npm ci
 
-RUN npm run build --prod
+COPY . .
+RUN npm run build
 
-# Stage 3: Nginx config stage
-FROM base as nginx-stage
+# ---- Runtime image ----
+FROM node:${NODE_VERSION} AS runner
 
-# Copy custom Nginx configuration
-COPY --chown=appuser:appgroup ./nginx.conf /etc/nginx/nginx.conf
+# tini is PID 1 in place of node, so signals (docker stop) and zombie
+# processes are handled correctly instead of being swallowed by node.
+RUN apk add --no-cache tini
 
-# Adjust ownership of Nginx directories
-RUN chown -R appuser:appgroup /usr/share/nginx/html
-
-# Expose port 80
-EXPOSE 80
-
-# Switch back to appuser
-USER appuser
-
-FROM base as serve-stage
-
-# Set the working directory
 WORKDIR /app
+ENV NODE_ENV=production
+ENV PORT=4000
 
-# Copy built Angular application from the build stage
-COPY --from=build-stage /app /app
+# Angular's application builder bundles the server output (including
+# express and every other runtime dependency) with esbuild, so nothing
+# outside Node's own built-ins is required at runtime - no node_modules
+# needed here. Verified: the built server.mjs has zero bare-specifier
+# imports besides node:* built-ins, and runs correctly with no
+# node_modules present at all.
+COPY --from=build /app/dist ./dist
 
-# Use Nginx to reverse proxy to Angular SSR application
-FROM nginx-stage
+# The official node images ship a non-root "node" user (uid 1000) already.
+USER node
 
-USER appuser
+EXPOSE 4000
 
-# Start both Node.js and Nginx
-CMD ["sh", "-c", "npm run serve:ssr & nginx -g 'daemon off;'"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get({ host: 'localhost', port: process.env.PORT || 4000, path: '/' }, (res) => process.exit(res.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "dist/ui/server/server.mjs"]

@@ -1,13 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { HeroComponent } from "../hero/hero.component";
 import { GalleryComponent } from "../gallery/gallery.component";
+import { ServicesComponent } from "../services/services.component";
+import { PackagesComponent } from "../packages/packages.component";
+import { TrustComponent } from "../trust/trust.component";
+import { ContactCtaComponent } from "../contact-cta/contact-cta.component";
 
 @Component({
     selector: 'app-home',
-    standalone: true,
     templateUrl: './home.component.html',
     styleUrl: './home.component.css',
-    imports: [HeroComponent, GalleryComponent]
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [HeroComponent, ServicesComponent, PackagesComponent, TrustComponent, GalleryComponent, ContactCtaComponent]
 })
 export class HomeComponent {
 

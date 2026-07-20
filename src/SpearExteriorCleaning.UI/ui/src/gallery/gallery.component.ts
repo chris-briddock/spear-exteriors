@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy, HostListener } from '@angular/core';
+
 import { NgOptimizedImage } from '@angular/common';
 @Component({
-  selector: 'app-gallery',
-  standalone: true,
-  imports: [NgIf, NgFor, NgOptimizedImage],
-  templateUrl: './gallery.component.html',
-  styleUrl: './gallery.component.css'
+    selector: 'app-gallery',
+    imports: [NgOptimizedImage],
+    templateUrl: './gallery.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrl: './gallery.component.css'
 })
 
 export class GalleryComponent implements OnInit {
@@ -48,6 +48,7 @@ export class GalleryComponent implements OnInit {
   ];
 
   combinedMedia: string[] = [];
+  selectedImage: string | null = null;
 
   ngOnInit() {
     // Combine the arrays
@@ -55,5 +56,24 @@ export class GalleryComponent implements OnInit {
 
     // Sort the combined array (assuming sorting by filename)
     this.combinedMedia.sort();
+  }
+
+  openLightbox(media: string): void {
+    this.selectedImage = media;
+  }
+
+  closeLightbox(): void {
+    this.selectedImage = null;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeLightbox();
+  }
+
+  categoryLabel(media: string): string {
+    const folder = media.split('/')[1] ?? 'Exterior Cleaning';
+    const words = folder.replace(/([a-z])([A-Z])/g, '$1 $2').split(' ');
+    return words.join(' ');
   }
 }

@@ -1,15 +1,15 @@
-import { Component,  } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { NavigationItemProps } from './navigation-item-props';
 import { RouterLink } from '@angular/router';
-import { NgFor, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { BrandingComponent } from "../branding/branding.component";
 
 @Component({
     selector: 'app-nav',
-    standalone: true,
     templateUrl: './nav.component.html',
     styleUrl: './nav.component.css',
-    imports: [RouterLink, NgFor, NgClass, BrandingComponent]
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [RouterLink, NgClass, BrandingComponent]
 })
 
 export class NavComponent {
@@ -25,12 +25,16 @@ export class NavComponent {
       this.isNavOpen = true;
       this.navState = 'visible';
     } else {
-      this.isNavOpen = false;
-      this.navState = 'closing';
-      setTimeout(() => {
-        this.navState = 'hidden';
-      }, 500);
+      this.closeNav();
     }
+  }
+
+  public closeNav(): void {
+    this.isNavOpen = false;
+    this.navState = 'closing';
+    setTimeout(() => {
+      this.navState = 'hidden';
+    }, 500);
   }
 
   navigationItems: NavigationItemProps[] = [
@@ -39,6 +43,13 @@ export class NavComponent {
       title: 'Services',
       content: ['Window Cleaning', 'Gutter Cleaning', 'Pressure Washing', 'Full Exterior Cleaning', 'Conservatory Cleaning', 'Roof Cleaning', 'Render Cleaning', 'Soffit & Fascia Cleaning'],
       link: ['window-cleaning', 'gutter-cleaning', 'pressure-washing', 'full-exterior-cleaning', 'conservatory-cleaning', 'roof-cleaning', 'render-cleaning', 'soffit-fascia-cleaning' ],
+      expanded: false,
+    },
+    {
+      id: 2,
+      title: 'Handyman',
+      content: ['Flat Pack Furniture Building', 'Shelf Hanging', 'TV Wall Mounting', 'Wood & Laminate Flooring Laying', 'Picture & Mirror Hanging'],
+      link: ['flat-pack-furniture-building', 'shelf-hanging', 'tv-wall-mounting', 'wood-laminate-flooring-laying', 'picture-mirror-hanging'],
       expanded: false,
     }
   ];

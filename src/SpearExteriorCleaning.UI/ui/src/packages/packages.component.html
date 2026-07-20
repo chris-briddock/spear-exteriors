@@ -1,0 +1,49 @@
+<section id="packages" class="bg-white py-20 md:py-28">
+  <div class="container mx-auto px-4">
+    <div class="max-w-2xl mx-auto text-center mb-14">
+      <span class="text-custom-primary font-heading font-semibold uppercase tracking-widest text-sm">Simple, Upfront Pricing</span>
+      <h2 class="font-heading text-3xl md:text-5xl font-extrabold text-custom-navy mt-3 mb-4">Packages</h2>
+      <p class="text-custom-dark-grey text-lg">
+        Four ways to get your exterior looking its best, from a quick refresh to the full works.
+        Prices start from the amount shown &mdash; every home is different, so we'll confirm the exact cost after
+        a quick look at your property. Don't see quite what you need? Get in touch for a free, no-obligation quote.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 items-stretch">
+      @for (tier of tiers; track tier.name) {
+        <article
+          class="flex flex-col bg-white rounded-2xl p-6 transition-shadow duration-300 hover:shadow-xl"
+          [ngClass]="tier.highlight ? 'border-2 border-custom-primary shadow-xl' : 'border border-black/10 shadow-sm'">
+          @if (tier.highlight) {
+            <span class="self-start bg-custom-primary text-white text-xs font-heading font-semibold uppercase tracking-wide py-1 px-3 rounded-full mb-4">
+              Most Comprehensive
+            </span>
+          }
+          <h3 class="font-heading font-bold text-2xl text-custom-navy mb-1">{{ tier.name }}</h3>
+          <p class="text-custom-dark-grey text-sm mb-5">{{ tier.tagline }}</p>
+          <p class="mb-6">
+            <span class="text-sm text-custom-dark-grey">From</span>
+            <span class="font-heading font-extrabold text-3xl text-custom-navy ml-1">{{ tier.fromPrice }}</span>
+          </p>
+
+          <ul class="space-y-3 mb-8 flex-1">
+            @for (feature of tier.features; track feature) {
+              <li class="flex gap-2.5 text-sm text-custom-dark-grey leading-relaxed">
+                <svg class="w-5 h-5 text-custom-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                <span>{{ feature }}</span>
+              </li>
+            }
+          </ul>
+
+          <a href="#contact"
+            class="mt-auto text-center bg-custom-accent hover:bg-custom-accent-dark transition-colors text-white font-heading font-semibold py-2.5 px-5 rounded-full">
+            Get a Quote
+          </a>
+        </article>
+      }
+    </div>
+  </div>
+</section>

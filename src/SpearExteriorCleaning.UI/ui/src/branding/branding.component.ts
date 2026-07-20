@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-branding',
-  standalone: true,
-  imports: [],
-  templateUrl: './branding.component.html',
-  styleUrl: './branding.component.css'
+    selector: 'app-branding',
+    imports: [RouterLink],
+    templateUrl: './branding.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrl: './branding.component.css'
 })
 export class BrandingComponent {
 

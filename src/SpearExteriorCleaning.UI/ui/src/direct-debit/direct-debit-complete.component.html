@@ -1,0 +1,55 @@
+<section class="bg-white py-24 md:py-32 min-h-[60vh] flex items-center">
+  <div class="container mx-auto px-4 text-center max-w-xl">
+    @switch (status) {
+      @case ('loading') {
+        <svg class="w-10 h-10 mx-auto text-custom-primary animate-spin mb-6" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4Z"></path>
+        </svg>
+        <h1 class="font-heading font-bold text-2xl text-custom-navy">Confirming your Direct Debit&hellip;</h1>
+      }
+      @case ('success') {
+        <span class="inline-flex w-16 h-16 rounded-full bg-custom-primary/10 items-center justify-center mb-6">
+          <svg class="w-8 h-8 text-custom-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </span>
+        <h1 class="font-heading font-bold text-3xl text-custom-navy mb-4">You're all set!</h1>
+        <p class="text-custom-dark-grey text-lg mb-8">
+          Your Direct Debit has been set up successfully. We'll take payment after each visit &mdash;
+          you don't need to do anything else.
+        </p>
+        <a routerLink="/"
+          class="inline-flex items-center justify-center bg-custom-accent hover:bg-custom-accent-dark transition-colors text-white font-heading font-semibold py-3 px-7 rounded-full">
+          Back to Home
+        </a>
+      }
+      @case ('missing') {
+        <h1 class="font-heading font-bold text-2xl text-custom-navy mb-4">No Direct Debit setup found</h1>
+        <p class="text-custom-dark-grey text-lg mb-8">
+          It looks like you navigated here directly. Head back to start setting up your Direct Debit.
+        </p>
+        <a routerLink="/direct-debit"
+          class="inline-flex items-center justify-center bg-custom-accent hover:bg-custom-accent-dark transition-colors text-white font-heading font-semibold py-3 px-7 rounded-full">
+          Set Up a Direct Debit
+        </a>
+      }
+      @case ('error') {
+        <h1 class="font-heading font-bold text-2xl text-custom-navy mb-4">We couldn't confirm your Direct Debit</h1>
+        <p class="text-custom-dark-grey text-lg mb-8">
+          Something went wrong finishing your setup. Please try again, or get in touch and we'll sort it out for you.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a routerLink="/direct-debit"
+            class="inline-flex items-center justify-center bg-custom-accent hover:bg-custom-accent-dark transition-colors text-white font-heading font-semibold py-3 px-7 rounded-full">
+            Try Again
+          </a>
+          <a href="tel:+447498070462"
+            class="inline-flex items-center justify-center border border-custom-navy/20 hover:bg-custom-cream transition-colors text-custom-navy font-heading font-semibold py-3 px-7 rounded-full">
+            Call 07498 070462
+          </a>
+        </div>
+      }
+    }
+  </div>
+</section>

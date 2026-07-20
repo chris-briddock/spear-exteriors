@@ -1,0 +1,46 @@
+<section class="bg-custom-navy py-20 md:py-28">
+  <div class="container mx-auto px-4 text-center">
+    <span class="text-custom-light-blue font-heading font-semibold uppercase tracking-widest text-sm">Recurring Payments</span>
+    <h1 class="font-heading text-3xl md:text-5xl font-extrabold text-white mt-3 mb-5">Set Up a Direct Debit</h1>
+    <p class="text-white/80 text-lg max-w-2xl mx-auto">
+      If you're on a regular cleaning schedule, set up a Direct Debit and we'll take care of the rest &mdash;
+      no more remembering to pay after every visit.
+    </p>
+  </div>
+</section>
+
+<section class="bg-white py-20 md:py-28">
+  <div class="container mx-auto px-4">
+    <div class="max-w-xl mx-auto bg-custom-cream rounded-2xl p-8 md:p-10 text-center">
+      <h2 class="font-heading font-bold text-2xl text-custom-navy mb-4">Secure setup via GoCardless</h2>
+      <p class="text-custom-dark-grey mb-2">
+        Takes about two minutes. You'll be securely redirected to GoCardless to enter your bank details &mdash;
+        we never see or store them.
+      </p>
+      <p class="text-custom-dark-grey mb-8">
+        You can cancel your Direct Debit at any time, directly with your bank or with GoCardless.
+      </p>
+
+      <button type="button" (click)="startSetup()" [disabled]="status === 'loading'"
+        class="inline-flex items-center justify-center gap-2 bg-custom-accent hover:bg-custom-accent-dark disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-white font-heading font-semibold py-3.5 px-8 rounded-full">
+        @if (status === 'loading') {
+          <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4Z"></path>
+          </svg>
+          Redirecting&hellip;
+        } @else {
+          Set Up a Direct Debit
+        }
+      </button>
+
+      @if (status === 'error') {
+        <p class="text-red-700 text-sm mt-5" role="alert">
+          Something went wrong starting your Direct Debit setup. Please try again, or
+          <a href="tel:+447498070462" class="underline hover:text-red-800">call us on 07498 070462</a>
+          or <a href="mailto:info@spearexteriors.co.uk" class="underline hover:text-red-800">email us</a>.
+        </p>
+      }
+    </div>
+  </div>
+</section>

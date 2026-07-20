@@ -1,0 +1,33 @@
+# Dependencies and build output (installed/built inside the image)
+node_modules
+dist
+out-tsc
+.angular
+
+# Version control
+.git
+.gitignore
+
+# Secrets - never bake these into an image layer
+.env
+.env.*
+!.env.example
+
+# Tests and tooling not needed to build or run the app
+e2e
+test-results
+playwright-report
+blob-report
+coverage
+
+# Editor/IDE
+.vscode
+.idea
+
+# Docker itself
+Dockerfile
+.dockerignore
+
+# Misc
+*.log
+.DS_Store
