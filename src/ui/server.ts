@@ -41,6 +41,14 @@ const angularApp = new AngularNodeAppEngine({ allowedHosts: getAllowedHosts() })
 // scheme when running behind a reverse proxy (e.g. Azure).
 app.set('trust proxy', 1);
 
+// Lightweight health endpoint for container orchestrator probes. Registered
+// before the Angular handler so it bypasses SSR and the host allowlist:
+// probes hit the pod on its internal IP, whose Host header is deliberately
+// not in allowedHosts, so routing them through Angular returns 400.
+app.get('/healthz', (_req, res) => {
+  res.status(200).send('ok');
+});
+
 app.use(
   express.json({
     verify: (req, _res, buf) => {

@@ -106,13 +106,13 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
           probes: [
             {
               type: 'Liveness'
-              httpGet: { path: '/', port: 4000 }
+              httpGet: { path: '/healthz', port: 4000 }
               initialDelaySeconds: 10
               periodSeconds: 30
             }
             {
               type: 'Readiness'
-              httpGet: { path: '/', port: 4000 }
+              httpGet: { path: '/healthz', port: 4000 }
               initialDelaySeconds: 5
               periodSeconds: 10
             }
