@@ -1,0 +1,171 @@
+name: Deploy UI to Azure Container Apps
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/ui/**'
+      - 'infra/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ui-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/spear-exteriors-ui
+  RESOURCE_GROUP: spear-exteriors-rg
+  LOCATION: uksouth
+  CONTAINER_APP_NAME: spear-exteriors-ui
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/ui/package-lock.json
+
+      - name: Install dependencies
+        working-directory: src/ui
+        run: npm ci
+
+      - name: Run unit tests (Karma)
+        working-directory: src/ui
+        run: npm run test:coverage
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/ui/package-lock.json
+
+      - name: Install dependencies
+        working-directory: src/ui
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: src/ui
+        run: npx playwright install --with-deps chromium
+
+      - name: Run e2e tests (Playwright)
+        working-directory: src/ui
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: src/ui/playwright-report/
+          retention-days: 14
+
+  build-and-push:
+    needs: [unit-tests, e2e-tests]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: src/ui
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - id: meta
+        run: echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Log in to Azure (OIDC)
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure resource group exists
+        run: |
+          az group create \
+            --name "$RESOURCE_GROUP" \
+            --location "$LOCATION" \
+            --output none
+
+      - name: Deploy infrastructure and app
+        id: deploy
+        run: |
+          deploy() {
+            az deployment group create \
+              --resource-group "$RESOURCE_GROUP" \
+              --template-file infra/main.bicep \
+              --parameters \
+                appName="$CONTAINER_APP_NAME" \
+                location="$LOCATION" \
+                containerImage="${{ needs.build-and-push.outputs.image }}" \
+                ghcrUsername="${{ github.actor }}" \
+                ghcrPassword="${{ secrets.GHCR_PULL_PAT }}" \
+                gocardlessAccessToken="${{ secrets.GOCARDLESS_ACCESS_TOKEN }}" \
+                gocardlessEnvironment="${{ vars.GOCARDLESS_ENVIRONMENT }}" \
+                siteUrl="${{ vars.SITE_URL }}" \
+                gocardlessWebhookSecret="${{ secrets.GOCARDLESS_WEBHOOK_SECRET }}" \
+                allowedHosts="$1" \
+              --query 'properties.outputs.containerAppFqdn.value' \
+              --output tsv
+          }
+
+          extra_hosts="${{ vars.ALLOWED_HOSTS }}"
+          fqdn=$(deploy "$extra_hosts")
+
+          # The app's own hostname can't be known until after this first deploy
+          # (it's derived from the Container Apps environment's default domain).
+          # Fold it into allowedHosts and redeploy - otherwise the SSR engine
+          # rejects every request made to the app's real address.
+          combined_hosts="$fqdn"
+          [ -n "$extra_hosts" ] && combined_hosts="$fqdn,$extra_hosts"
+          fqdn=$(deploy "$combined_hosts")
+
+          echo "fqdn=$fqdn" >> "$GITHUB_OUTPUT"
+          echo "url=https://$fqdn" >> "$GITHUB_OUTPUT"
+
+      - name: Show deployed URL
+        run: echo "Deployed to ${{ steps.deploy.outputs.url }}"
